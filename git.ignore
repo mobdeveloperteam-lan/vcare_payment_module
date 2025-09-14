@@ -1,0 +1,60 @@
+cat > .gitignore <<'EOF'
+# Flutter/Dart/Pub related
+.dart_tool/
+.packages
+.pub-cache/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+generated_plugin_registrant.dart
+
+# Android related
+**/android/.gradle/
+**/android/local.properties
+**/android/app/key.properties
+**/android/captures/
+**/android/app/*.keystore
+**/android/app/*.jks
+
+# iOS related
+**/ios/Flutter/Flutter.framework
+**/ios/Flutter/Flutter.podspec
+**/ios/Flutter/Generated.xcconfig
+**/ios/Flutter/ephemeral/
+**/ios/Pods/
+**/ios/.symlinks/
+**/ios/build/
+**/ios/Runner.xcworkspace/
+**/ios/Runner/GeneratedPluginRegistrant.*
+
+# macOS related
+**/macos/Flutter/ephemeral/
+**/macos/Pods/
+**/macos/build/
+
+# Windows related
+**/windows/Flutter/ephemeral/
+**/windows/build/
+
+# Linux related
+**/linux/Flutter/ephemeral/
+**/linux/build/
+
+# Web related
+**/web/.dart_tool/
+
+# VS Code / IntelliJ / Xcode
+.vscode/
+.idea/
+*.iml
+*.ipr
+*.iws
+xcuserdata/
+
+# Others
+*.log
+*.lock
+*.tmp
+*.swp
+.DS_Store
+EOF

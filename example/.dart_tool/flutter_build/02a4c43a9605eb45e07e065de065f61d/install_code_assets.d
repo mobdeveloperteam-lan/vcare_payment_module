@@ -1,0 +1,1 @@
+ /Users/Developers/studioProjects/vcarePaymentGateWay/vcare_payment_module/example/.dart_tool/flutter_build/02a4c43a9605eb45e07e065de065f61d/native_assets.json: 
