@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:vcare_payment_module/vcare_payment_module_method_channel.dart';
 
 class VcarePaymentScreen extends StatefulWidget {
@@ -52,9 +52,12 @@ class _VcarePaymentScreenState extends State<VcarePaymentScreen> {
         return;
       }
 
-      setState(() => log = "PaymentMethod: $paymentMethodId\nCreating PaymentIntent...");
+      setState(
+        () =>
+            log = "PaymentMethod: $paymentMethodId\nCreating PaymentIntent...",
+      );
 
-      const secretKey = "sk_test_XXXXXXXXXXXXXXXXXXXXXXXX"; // for testing only
+      const secretKey = ""; // for testing only
 
       final response = await http.post(
         Uri.parse('https://api.stripe.com/v1/payment_intents'),
@@ -83,9 +86,9 @@ class _VcarePaymentScreenState extends State<VcarePaymentScreen> {
   }
 
   Widget field(String label, TextEditingController c) => TextField(
-        controller: c,
-        decoration: InputDecoration(labelText: label),
-      );
+    controller: c,
+    decoration: InputDecoration(labelText: label),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -114,7 +117,10 @@ class _VcarePaymentScreenState extends State<VcarePaymentScreen> {
             field("Postal Code", postal),
             field("Country", country),
             const SizedBox(height: 20),
-            ElevatedButton(onPressed: startPayment, child: const Text("Pay \$10")),
+            ElevatedButton(
+              onPressed: startPayment,
+              child: const Text("Pay \$10"),
+            ),
             const SizedBox(height: 20),
             Text(log),
           ],

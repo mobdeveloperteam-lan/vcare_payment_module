@@ -32,33 +32,33 @@ class _PaymentScreenState extends State<PaymentScreen> {
     });
   }
 
-  void _pay() async {
-    try {
-      // 1. Initialize Stripe
-      final init = await VcarePaymentModule.initGateway(
-        publishableKey:
-            'pk_test_51LcnksCi1Ok5JOLQ4041lFfwOrEnfkl9LN4XGPcxdWmbWQXbvxWoZjUN1K79ZleQQzIp2m10W95NtaHJQPttUMBm00iRG25RQC',
-        secretKey:
-            'sk_test_51LcnksCi1Ok5JOLQRMoSThdNaqPFphPOaXyXJ7LtyD5x53Q2O7JRHsrBtriiCOinjRYtIzDsHqZGlxN4P34KlRSW00k01AibOs', // TEST ONLY
-      );
-      setState(() => _result = "Init Gateway: $init");
+  // void _pay() async {
+  //   try {
+  //     // 1. Initialize Stripe
+  //     final init = await VcarePaymentModule.initGateway(
+  //       publishableKey:
+  //           '',
+  //       secretKey:
+  //           '', // TEST ONLY
+  //     );
+  //     setState(() => _result = "Init Gateway: $init");
 
-      // 2. Wait a tiny bit to ensure Activity is attached
-      await Future.delayed(const Duration(milliseconds: 100));
+  //     // 2. Wait a tiny bit to ensure Activity is attached
+  //     await Future.delayed(const Duration(milliseconds: 100));
 
-      // 3. Start payment
-      await VcarePaymentModule.startPayment(
-        amount: 100, // 1 USD in cents
-        currency: 'usd',
-        publishableKey:
-            'pk_test_51LcnksCi1Ok5JOLQ4041lFfwOrEnfkl9LN4XGPcxdWmbWQXbvxWoZjUN1K79ZleQQzIp2m10W95NtaHJQPttUMBm00iRG25RQC',
-      );
+  //     // 3. Start payment
+  //     await VcarePaymentModule.startPayment(
+  //       amount: 100, // 1 USD in cents
+  //       currency: 'usd',
+  //       publishableKey:
+  //           '',
+  //     );
 
-      // Result will be handled in the listener
-    } catch (e) {
-      setState(() => _result = 'Error: $e');
-    }
-  }
+  //     // Result will be handled in the listener
+  //   } catch (e) {
+  //     setState(() => _result = 'Error: $e');
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -71,7 +71,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
             ElevatedButton(
               onPressed: () {
                 WidgetsBinding.instance.addPostFrameCallback((_) {
-                  _pay();
+                  // _pay();
                 });
               },
               child: const Text("Pay with Stripe"),
