@@ -80,6 +80,18 @@
       "languageVersion": "3.7"
     },
     {
+      "name": "http",
+      "rootUri": "file:///Users/Developers/.pub-cache/hosted/pub.dev/http-1.5.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
+    },
+    {
+      "name": "http_parser",
+      "rootUri": "file:///Users/Developers/.pub-cache/hosted/pub.dev/http_parser-4.1.2",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
+    },
+    {
       "name": "integration_test",
       "rootUri": "file:///Users/Developers/fvm/versions/3.32.2/packages/integration_test",
       "packageUri": "lib/",
@@ -200,6 +212,12 @@
       "languageVersion": "3.5"
     },
     {
+      "name": "typed_data",
+      "rootUri": "file:///Users/Developers/.pub-cache/hosted/pub.dev/typed_data-1.4.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.5"
+    },
+    {
       "name": "vcare_payment_module",
       "rootUri": "../../",
       "packageUri": "lib/",
@@ -216,6 +234,12 @@
       "rootUri": "file:///Users/Developers/.pub-cache/hosted/pub.dev/vm_service-15.0.0",
       "packageUri": "lib/",
       "languageVersion": "3.3"
+    },
+    {
+      "name": "web",
+      "rootUri": "file:///Users/Developers/.pub-cache/hosted/pub.dev/web-1.1.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
     },
     {
       "name": "webdriver",

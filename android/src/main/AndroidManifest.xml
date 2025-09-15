@@ -1,3 +1,15 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-  package="com.example.vcare_payment_module">
+    package="com.example.vcare_payment_module">
+
+    <application>
+        <meta-data
+            android:name="com.example.vcare_payment_module.StripeSdkFlutterPlugin"
+            android:value="FlutterPlugin" />
+
+        <!-- Declare your PaymentSheetActivity -->
+        <activity android:name=".StripePaymentActivity"
+    android:exported="false"
+    android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+    </application>
+
 </manifest>

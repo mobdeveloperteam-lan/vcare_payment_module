@@ -1,58 +1,70 @@
 package com.example.vcare_payment_module
 
+import android.app.Activity
+import android.content.Context
+import android.content.Intent
 import android.util.Log
 import io.flutter.embedding.engine.plugins.FlutterPlugin
+import io.flutter.embedding.engine.plugins.activity.ActivityAware
+import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
-import io.flutter.plugin.common.MethodChannel.MethodCallHandler
-import io.flutter.plugin.common.MethodChannel.Result
 
-/** VcarePaymentModulePlugin */
-class VcarePaymentModulePlugin : FlutterPlugin, MethodCallHandler {
-  private lateinit var channel: MethodChannel
+class VcarePaymentModulePlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware {
 
-  override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
-    channel = MethodChannel(flutterPluginBinding.binaryMessenger, "vcare_payment_module")
-    channel.setMethodCallHandler(this)
-  }
+    private lateinit var channel: MethodChannel
+    private lateinit var context: Context
+    private var activity: Activity? = null
+    private val TAG = "VcarePaymentModule"
 
-  override fun onMethodCall(call: MethodCall, result: Result) {
-    when (call.method) {
-      "getPlatformVersion" -> {
-        result.success("Android ${android.os.Build.VERSION.RELEASE}")
-      }
-
-      "startPayment" -> {
-        val amount = call.argument<Int>("amount") ?: 0
-        val currency = call.argument<String>("currency") ?: "INR"
-        val gateway = call.argument<String>("gateway") ?: ""
-
-        when (gateway.lowercase()) {
-          "stripe" -> {
-            Log.d("VcarePaymentModule", "Starting payment via Stripe")
-            // TODO: Integrate Stripe Android SDK here
-            result.success("Stripe payment started for $amount $currency")
-          }
-
-          "razorpay" -> {
-            Log.d("VcarePaymentModule", "Starting payment via Razorpay")
-            // TODO: Integrate Razorpay Android SDK here
-            result.success("Razorpay payment started for $amount $currency")
-          }
-
-          else -> {
-            result.error("INVALID_GATEWAY", "Unsupported payment gateway: $gateway", null)
-          }
-        }
-      }
-
-      else -> {
-        result.notImplemented()
-      }
+    override fun onAttachedToEngine(binding: FlutterPlugin.FlutterPluginBinding) {
+        context = binding.applicationContext
+        channel = MethodChannel(binding.binaryMessenger, "vcare_payment_module")
+        channel.setMethodCallHandler(this)
+        Log.i(TAG, "Plugin attached to engine")
     }
-  }
 
-  override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
-    channel.setMethodCallHandler(null)
-  }
+    override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
+        when (call.method) {
+
+            "initGateway" -> {
+                result.success("Stripe initialized")
+            }
+
+            "startPayment" -> {
+                val act = activity
+                if (act == null) {
+                    result.error("NO_ACTIVITY", "Activity not attached yet", null)
+                    return
+                }
+
+                val intent = Intent(act, StripePaymentActivity::class.java).apply {
+                    putExtra("publishableKey", call.argument<String>("publishableKey") ?: "")
+                    putExtra("clientSecret", call.argument<String>("clientSecret") ?: "")
+                    putExtra("customerId", call.argument<String>("customerId") ?: "")
+                    putExtra("ephemeralKey", call.argument<String>("ephemeralKey") ?: "")
+                }
+
+                act.startActivity(intent)
+                result.success("Payment sheet launched")
+            }
+
+            else -> result.notImplemented()
+        }
+    }
+
+    override fun onAttachedToActivity(binding: ActivityPluginBinding) {
+        activity = binding.activity
+        Log.i(TAG, "Activity attached: $activity")
+    }
+
+    override fun onDetachedFromActivity() { activity = null }
+    override fun onDetachedFromActivityForConfigChanges() { activity = null }
+    override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
+        activity = binding.activity
+    }
+
+    override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
+        channel.setMethodCallHandler(null)
+    }
 }
