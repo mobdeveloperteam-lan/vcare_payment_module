@@ -12,7 +12,10 @@
     android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
     <activity
     android:name=".StripeSetupActivity"
-    android:exported="true" />
+    android:exported="true" 
+    android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+    />
+
     </application>
 
 </manifest>

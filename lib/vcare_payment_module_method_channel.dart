@@ -1,10 +1,12 @@
 import 'dart:convert';
 import 'dart:developer';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 
-typedef PaymentResultCallback = void Function(String result, {Map<String, dynamic>? paymentMethod});
+typedef PaymentResultCallback =
+    void Function(String result, {Map<String, dynamic>? paymentMethod});
 
 class VcarePaymentModule {
   static const MethodChannel _channel = MethodChannel('vcare_payment_module');
@@ -14,7 +16,6 @@ class VcarePaymentModule {
   static Future<String?> initStripeGateway({
     required String publishableKey,
     required String secretKey,
-    
   }) async {
     _stripeSecretKey = secretKey;
     final res = await _channel.invokeMethod<String>('initStripeGateway', {
@@ -27,10 +28,12 @@ class VcarePaymentModule {
   /// Start SetupIntent flow entirely from Flutter
   static Future<void> startStripeSetup({
     required String publishableKey,
-    required String clientName
+    required String clientName,
   }) async {
     if (_stripeSecretKey == null) {
-      log("❌ Stripe secret key not set");
+      if (kDebugMode) {
+        log("❌ Stripe secret key not set");
+      }
       return;
     }
 
@@ -45,7 +48,9 @@ class VcarePaymentModule {
       );
       final customerBody = jsonDecode(customerResp.body);
       final customerId = customerBody['id'];
-      log("✅ Customer created: $customerId");
+      if (kDebugMode) {
+        log("✅ Customer created: $customerId");
+      }
 
       // 2️⃣ Create Ephemeral Key
       final ephResp = await http.post(
@@ -59,7 +64,9 @@ class VcarePaymentModule {
       );
       final ephBody = jsonDecode(ephResp.body);
       final ephemeralKey = ephBody['secret'];
-      log("✅ Ephemeral key created: $ephemeralKey");
+      if (kDebugMode) {
+        log("✅ Ephemeral key created: $ephemeralKey");
+      }
 
       // 3️⃣ Create SetupIntent
       final setupResp = await http.post(
@@ -68,14 +75,13 @@ class VcarePaymentModule {
           'Authorization': 'Bearer $_stripeSecretKey',
           'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: {
-          'customer': customerId,
-          'payment_method_types[]': 'card',
-        },
+        body: {'customer': customerId, 'payment_method_types[]': 'card'},
       );
       final setupBody = jsonDecode(setupResp.body);
       final clientSecret = setupBody['client_secret'];
-      log("✅ SetupIntent created: $clientSecret");
+      if (kDebugMode) {
+        log("✅ SetupIntent created: $clientSecret");
+      }
 
       // 4️⃣ Launch native Setup Sheet via MethodChannel
       await _channel.invokeMethod('startStripeSetupSheet', {
@@ -84,22 +90,32 @@ class VcarePaymentModule {
         'customerId': customerId,
         'ephemeralKey': ephemeralKey,
         'secretKey': _stripeSecretKey,
-        'clientName': clientName
+        'clientName': clientName,
       });
-      log("🚀 Setup sheet launched");
+      if (kDebugMode) {
+        log("🚀 Setup sheet launched");
+      }
     } catch (e, s) {
-      log("❌ Error starting setup: $e\n$s");
+      if (kDebugMode) {
+        log("❌ Error starting setup: $e\n$s");
+      }
     }
   }
 
   /// Listen to setup/payment callbacks
   static void setStripePaymentResultListener(PaymentResultCallback listener) {
     _channel.setMethodCallHandler((call) async {
-      log("📩 Flutter received callback: ${call.method}, arguments: ${call.arguments}");
+      if (kDebugMode) {
+        log(
+          "📩 Flutter received callback: ${call.method}, arguments: ${call.arguments}",
+        );
+      }
       switch (call.method) {
         case 'paymentSuccess':
           final arg = call.arguments as Map;
-          final pmDetails = arg['details'] != null ? jsonDecode(arg['details']) : null;
+          final pmDetails = arg['details'] != null
+              ? jsonDecode(arg['details'])
+              : null;
           listener(
             "Setup Completed!",
             paymentMethod: {...arg, 'details': pmDetails},
