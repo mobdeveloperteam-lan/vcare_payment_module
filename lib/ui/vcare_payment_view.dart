@@ -1,130 +1,105 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:vcare_payment_module/vcare_payment_module_method_channel.dart';
+import 'package:vcare_payment_module/ui/multi_gateway_page.dart';
+import 'package:vcare_payment_module/ui/stripe_payment_module.dart';
 
-class VcarePaymentScreen extends StatefulWidget {
-  const VcarePaymentScreen({super.key});
+class VcarePaymentView extends StatefulWidget {
+  final Map<String, dynamic> input;
+  const VcarePaymentView({super.key, this.input = const {}});
 
   @override
-  State<VcarePaymentScreen> createState() => _VcarePaymentScreenState();
+  State<VcarePaymentView> createState() => _VcarePaymentViewState();
 }
 
-class _VcarePaymentScreenState extends State<VcarePaymentScreen> {
-  final cardNumber = TextEditingController();
-  final expMonth = TextEditingController();
-  final expYear = TextEditingController();
-  final cvc = TextEditingController();
+class _VcarePaymentViewState extends State<VcarePaymentView> {
+  String paymentModuleState = "loading";
+  String paymentGateway = "";
+  bool supportsMultiGateWay = false;
+  List<String> gateWays = [];
+  Map<String, dynamic> stripeDetails = {};
+  String clientName = "";
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Display dialog after UI has rerendered
+      analyzeInput();
+    });
+  }
 
-  final name = TextEditingController();
-  final email = TextEditingController();
-  final phone = TextEditingController();
-  final line1 = TextEditingController();
-  final city = TextEditingController();
-  final state = TextEditingController();
-  final postal = TextEditingController();
-  final country = TextEditingController();
-
-  String log = "";
-
-  Future<void> startPayment() async {
-    setState(() => log = "Creating PaymentMethod...");
-
-    try {
-      final paymentMethodId = await VcarePaymentModule.createPaymentMethod(
-        cardNumber: cardNumber.text.trim(),
-        expMonth: int.parse(expMonth.text),
-        expYear: int.parse(expYear.text),
-        cvc: cvc.text.trim(),
-        name: name.text,
-        email: email.text,
-        phone: phone.text,
-        line1: line1.text,
-        city: city.text,
-        state: state.text,
-        postalCode: postal.text,
-        country: country.text,
-      );
-
-      if (paymentMethodId == null) {
-        setState(() => log = "Failed to create payment method");
-        return;
-      }
-
-      setState(
-        () =>
-            log = "PaymentMethod: $paymentMethodId\nCreating PaymentIntent...",
-      );
-
-      const secretKey = ""; // for testing only
-
-      final response = await http.post(
-        Uri.parse('https://api.stripe.com/v1/payment_intents'),
-        headers: {
-          'Authorization': 'Bearer $secretKey',
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: {
-          'amount': '1000',
-          'currency': 'usd',
-          'payment_method': paymentMethodId,
-          'confirmation_method': 'manual',
-          'confirm': 'true',
-        },
-      );
-
-      final body = json.decode(response.body);
-      if (response.statusCode == 200) {
-        setState(() => log = "Payment Success ✅\n$body");
+  void analyzeInput() {
+    if (widget.input.isNotEmpty) {
+      if (widget.input.containsKey("client_supported_payment_sdk_config")) {
+        setPaymentModuleState(
+          widget.input["client_supported_payment_sdk_config"],
+        );
+        clientName = widget.input['client_name'] ?? "";
       } else {
-        setState(() => log = "Payment Failed ❌\n${body['error'] ?? body}");
+        paymentModuleTruncate();
       }
-    } catch (e) {
-      setState(() => log = "Error: $e");
+    } else {
+      paymentModuleTruncate();
+    }
+    setState(() {});
+  }
+
+  void paymentModuleTruncate() {
+    Future.delayed(const Duration(seconds: 2), () {
+      setState(() {
+        paymentModuleState = "Could not found payment details";
+      });
+    });
+  }
+
+  void setPaymentModuleState(
+    Map<String, dynamic> clientSupportedPaymentSdkConfig,
+  ) {
+    if (clientSupportedPaymentSdkConfig.isNotEmpty) {
+      supportsMultiGateWay =
+          clientSupportedPaymentSdkConfig["supports_multi_gateway"] ?? false;
+      gateWays = clientSupportedPaymentSdkConfig["gateways"] ?? [];
+      stripeDetails = clientSupportedPaymentSdkConfig["stripe_configs"] ?? {};
+
+      if (gateWays.isNotEmpty) {
+        paymentModuleState = "gateway found";
+      }
+      if (!supportsMultiGateWay) {
+        paymentGateway = gateWays.first;
+      }
+      if (paymentGateway.isEmpty && gateWays.isEmpty) {
+        paymentModuleTruncate();
+      }
     }
   }
 
-  Widget field(String label, TextEditingController c) => TextField(
-    controller: c,
-    decoration: InputDecoration(labelText: label),
-  );
+  Widget loadUI() {
+    if (paymentModuleState == "loading") {
+      return Center(child: CircularProgressIndicator());
+    } else {
+      if (paymentModuleState == "gateway found") {
+        if (supportsMultiGateWay) {
+          return MultiGatewayPage(gateWays: gateWays);
+        } else {
+          if (paymentGateway == "stripe") {
+            return StripePaymentModule(
+              details: stripeDetails,
+              clientName: clientName,
+            );
+          }
+        }
+      } else {
+        return Center(child: Text(paymentModuleState));
+      }
+    }
+    return SizedBox();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Stripe Payment')),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            field("Card Number", cardNumber),
-            Row(
-              children: [
-                Expanded(child: field("MM", expMonth)),
-                const SizedBox(width: 8),
-                Expanded(child: field("YYYY", expYear)),
-              ],
-            ),
-            field("CVC", cvc),
-            const Divider(),
-            field("Name", name),
-            field("Email", email),
-            field("Phone", phone),
-            field("Address Line 1", line1),
-            field("City", city),
-            field("State", state),
-            field("Postal Code", postal),
-            field("Country", country),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: startPayment,
-              child: const Text("Pay \$10"),
-            ),
-            const SizedBox(height: 20),
-            Text(log),
-          ],
-        ),
+      body: SizedBox(
+        width: double.infinity,
+        height: double.infinity,
+        child: loadUI(),
       ),
     );
   }

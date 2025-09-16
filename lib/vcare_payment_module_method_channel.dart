@@ -1,42 +1,41 @@
 import 'dart:convert';
 import 'dart:developer';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 
-typedef PaymentResultCallback = void Function(String result);
+typedef PaymentResultCallback = void Function(String result, {Map<String, dynamic>? paymentMethod});
 
 class VcarePaymentModule {
   static const MethodChannel _channel = MethodChannel('vcare_payment_module');
   static String? _stripeSecretKey;
 
-  /// Initialize Stripe
+  /// Initialize Stripe (store secretKey for in-app API calls)
   static Future<String?> initGateway({
     required String publishableKey,
-    String? secretKey,
+    required String secretKey,
+    
   }) async {
     _stripeSecretKey = secretKey;
     final res = await _channel.invokeMethod<String>('initGateway', {
       'publishableKey': publishableKey,
     });
-    if (kDebugMode) log("initGateway result -> $res");
+    if (kDebugMode) log("✅ initGateway result -> $res");
     return res;
   }
 
-  /// Start Stripe Payment
-  static Future<void> startPayment({
-    required int amount,
-    required String currency,
+  /// Start SetupIntent flow entirely from Flutter
+  static Future<void> startSetup({
     required String publishableKey,
+    required String clientName
   }) async {
     if (_stripeSecretKey == null) {
-      log("Stripe secret key not set. Call initGateway first.");
+      log("❌ Stripe secret key not set");
       return;
     }
 
     try {
-      // 1. Create Customer
+      // 1️⃣ Create Customer
       final customerResp = await http.post(
         Uri.parse('https://api.stripe.com/v1/customers'),
         headers: {
@@ -44,10 +43,11 @@ class VcarePaymentModule {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
       );
-      final customerId = jsonDecode(customerResp.body)['id'];
-      if (kDebugMode) log("Customer ID -> $customerId");
+      final customerBody = jsonDecode(customerResp.body);
+      final customerId = customerBody['id'];
+      log("✅ Customer created: $customerId");
 
-      // 2. Create Ephemeral Key
+      // 2️⃣ Create Ephemeral Key
       final ephResp = await http.post(
         Uri.parse('https://api.stripe.com/v1/ephemeral_keys'),
         headers: {
@@ -57,87 +57,61 @@ class VcarePaymentModule {
         },
         body: {'customer': customerId},
       );
-      final ephemeralKey = jsonDecode(ephResp.body)['secret'];
-      if (kDebugMode) log("Ephemeral Key -> $ephemeralKey");
+      final ephBody = jsonDecode(ephResp.body);
+      final ephemeralKey = ephBody['secret'];
+      log("✅ Ephemeral key created: $ephemeralKey");
 
-      // 3. Create PaymentIntent
-      final piResp = await http.post(
-        Uri.parse('https://api.stripe.com/v1/payment_intents'),
+      // 3️⃣ Create SetupIntent
+      final setupResp = await http.post(
+        Uri.parse('https://api.stripe.com/v1/setup_intents'),
         headers: {
           'Authorization': 'Bearer $_stripeSecretKey',
           'Content-Type': 'application/x-www-form-urlencoded',
         },
         body: {
           'customer': customerId,
-          'amount': amount.toString(),
-          'currency': currency,
-          'automatic_payment_methods[enabled]': 'true',
+          'payment_method_types[]': 'card',
         },
       );
-      final clientSecret = jsonDecode(piResp.body)['client_secret'];
-      if (kDebugMode) log("PaymentIntent Client Secret -> $clientSecret");
+      final setupBody = jsonDecode(setupResp.body);
+      final clientSecret = setupBody['client_secret'];
+      log("✅ SetupIntent created: $clientSecret");
 
-      Future.delayed(const Duration(seconds: 2), () async {
-        // 4. Present PaymentSheet UI
-        final paySheet = await _channel.invokeMethod('startPayment', {
-          'publishableKey': publishableKey,
-          'clientSecret': clientSecret,
-          'customerId': customerId,
-          'ephemeralKey': ephemeralKey,
-        });
-        if (kDebugMode) log("Pay sheet -> $paySheet");
+      // 4️⃣ Launch native Setup Sheet via MethodChannel
+      await _channel.invokeMethod('startSetupSheet', {
+        'publishableKey': publishableKey,
+        'clientSecret': clientSecret,
+        'customerId': customerId,
+        'ephemeralKey': ephemeralKey,
+        'secretKey': _stripeSecretKey,
+        'clientName': clientName
       });
-    } catch (e) {
-      log("Error starting payment: $e");
+      log("🚀 Setup sheet launched");
+    } catch (e, s) {
+      log("❌ Error starting setup: $e\n$s");
     }
   }
 
-  /// Public method to listen to payment callbacks
+  /// Listen to setup/payment callbacks
   static void setPaymentResultListener(PaymentResultCallback listener) {
     _channel.setMethodCallHandler((call) async {
+      log("📩 Flutter received callback: ${call.method}, arguments: ${call.arguments}");
       switch (call.method) {
         case 'paymentSuccess':
-          listener("Payment Successful!");
+          final arg = call.arguments as Map;
+          final pmDetails = arg['details'] != null ? jsonDecode(arg['details']) : null;
+          listener(
+            "Setup Completed!",
+            paymentMethod: {...arg, 'details': pmDetails},
+          );
           break;
         case 'paymentCanceled':
-          listener("Payment Canceled!");
+          listener("Setup Canceled!", paymentMethod: null);
           break;
         case 'paymentFailed':
-          listener("Payment Failed: ${call.arguments ?? 'Unknown Error'}");
-          break;
-        default:
+          listener("Setup Failed!", paymentMethod: null);
           break;
       }
-    });
-  }
-
-  static Future<String?> createPaymentMethod({
-    required String cardNumber,
-    required int expMonth,
-    required int expYear,
-    required String cvc,
-    required String name,
-    required String email,
-    required String phone,
-    required String line1,
-    required String city,
-    required String state,
-    required String postalCode,
-    required String country,
-  }) {
-    return _channel.invokeMethod('createPaymentMethod', {
-      'cardNumber': cardNumber,
-      'expMonth': expMonth,
-      'expYear': expYear,
-      'cvc': cvc,
-      'name': name,
-      'email': email,
-      'phone': phone,
-      'line1': line1,
-      'city': city,
-      'state': state,
-      'postalCode': postalCode,
-      'country': country,
     });
   }
 }

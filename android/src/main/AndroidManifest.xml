@@ -10,6 +10,9 @@
         <activity android:name=".StripePaymentActivity"
     android:exported="false"
     android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+    <activity
+    android:name=".StripeSetupActivity"
+    android:exported="true" />
     </application>
 
 </manifest>
