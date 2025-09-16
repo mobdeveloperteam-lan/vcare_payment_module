@@ -11,13 +11,13 @@ class VcarePaymentModule {
   static String? _stripeSecretKey;
 
   /// Initialize Stripe (store secretKey for in-app API calls)
-  static Future<String?> initGateway({
+  static Future<String?> initStripeGateway({
     required String publishableKey,
     required String secretKey,
     
   }) async {
     _stripeSecretKey = secretKey;
-    final res = await _channel.invokeMethod<String>('initGateway', {
+    final res = await _channel.invokeMethod<String>('initStripeGateway', {
       'publishableKey': publishableKey,
     });
     if (kDebugMode) log("✅ initGateway result -> $res");
@@ -25,7 +25,7 @@ class VcarePaymentModule {
   }
 
   /// Start SetupIntent flow entirely from Flutter
-  static Future<void> startSetup({
+  static Future<void> startStripeSetup({
     required String publishableKey,
     required String clientName
   }) async {
@@ -78,7 +78,7 @@ class VcarePaymentModule {
       log("✅ SetupIntent created: $clientSecret");
 
       // 4️⃣ Launch native Setup Sheet via MethodChannel
-      await _channel.invokeMethod('startSetupSheet', {
+      await _channel.invokeMethod('startStripeSetupSheet', {
         'publishableKey': publishableKey,
         'clientSecret': clientSecret,
         'customerId': customerId,
@@ -93,7 +93,7 @@ class VcarePaymentModule {
   }
 
   /// Listen to setup/payment callbacks
-  static void setPaymentResultListener(PaymentResultCallback listener) {
+  static void setStripePaymentResultListener(PaymentResultCallback listener) {
     _channel.setMethodCallHandler((call) async {
       log("📩 Flutter received callback: ${call.method}, arguments: ${call.arguments}");
       switch (call.method) {

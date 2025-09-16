@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
             },
           },
           "client_name": "Flex Mobile",
-          "zip_code": "Flex Mobile",
+
 
         },
       ),

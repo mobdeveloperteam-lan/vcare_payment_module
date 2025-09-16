@@ -22,8 +22,8 @@ class VcarePaymentModulePlugin: FlutterPlugin, MethodChannel.MethodCallHandler, 
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         when (call.method) {
-            "initGateway" -> result.success("Gateway Initialized")
-            "startSetupSheet" -> {
+            "initStripeGateway" -> result.success("Gateway Initialized")
+            "startStripeSetupSheet" -> {
                 val intent = Intent(activity, StripeSetupActivity::class.java).apply {
                     putExtra("publishableKey", call.argument<String>("publishableKey"))
                     putExtra("clientSecret", call.argument<String>("clientSecret"))

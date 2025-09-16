@@ -55,7 +55,7 @@ class _StripePaymentModuleState extends State<StripePaymentModule> {
   void initState() {
     super.initState();
 
-    VcarePaymentModule.setPaymentResultListener((
+    VcarePaymentModule.setStripePaymentResultListener((
       result, {
       Map<String, dynamic>? paymentMethod,
     }) {
@@ -77,12 +77,12 @@ class _StripePaymentModuleState extends State<StripePaymentModule> {
   }
 
   Future<void> startPayment() async {
-    await VcarePaymentModule.initGateway(
+    await VcarePaymentModule.initStripeGateway(
       publishableKey: publishKey,
       secretKey: secretKey,
     );
 
-    await VcarePaymentModule.startSetup(
+    await VcarePaymentModule.startStripeSetup(
       publishableKey: publishKey,
       clientName: widget.clientName,
     );
