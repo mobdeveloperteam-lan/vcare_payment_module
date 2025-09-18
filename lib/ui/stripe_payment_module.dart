@@ -1,6 +1,7 @@
 // ignore_for_file: unused_local_variable
 
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -9,10 +10,13 @@ import 'package:vcare_payment_module/vcare_payment_module_method_channel.dart';
 class StripePaymentModule extends StatefulWidget {
   final Map<String, dynamic> details;
   final String clientName;
+  final String applePayMerchantID; // Your Merchant ID
+
   const StripePaymentModule({
     super.key,
     required this.details,
     required this.clientName,
+    required this.applePayMerchantID,
   });
 
   @override
@@ -31,8 +35,7 @@ class _StripePaymentModuleState extends State<StripePaymentModule> {
       print(creds);
     }
     if (creds.isNotEmpty) {
-      Map<String, dynamic> stripeConfigs = {};
-      stripeConfigs = creds;
+      Map<String, dynamic> stripeConfigs = creds;
       if (stripeConfigs.isNotEmpty) {
         publishKey = stripeConfigs["publish_key"] ?? "";
         secretKey = stripeConfigs["secret_key"] ?? "";
@@ -40,14 +43,14 @@ class _StripePaymentModuleState extends State<StripePaymentModule> {
       if (publishKey.isEmpty || secretKey.isEmpty) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text("Invalid credentials")));
+        ).showSnackBar(const SnackBar(content: Text("Invalid credentials")));
       } else {
         startPayment();
       }
     } else {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text("Unable to start payment")));
+      ).showSnackBar(const SnackBar(content: Text("Unable to start payment")));
     }
   }
 
@@ -85,6 +88,7 @@ class _StripePaymentModuleState extends State<StripePaymentModule> {
     await VcarePaymentModule.startStripeSetup(
       publishableKey: publishKey,
       clientName: widget.clientName,
+      applePayMerchantID: Platform.isIOS ? widget.applePayMerchantID : "",
     );
   }
 
@@ -96,7 +100,7 @@ class _StripePaymentModuleState extends State<StripePaymentModule> {
     final card = details['card'] ?? {};
     final billing = details['billing_details'] ?? {};
     final pmId = paymentMethod!['paymentMethodId'] ?? "Unknown";
-    final customerID = details!['customer'] ?? "Unknown";
+    final customerID = details['customer'] ?? "Unknown";
 
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 16),
@@ -106,13 +110,13 @@ class _StripePaymentModuleState extends State<StripePaymentModule> {
           "${card['brand']?.toString().toUpperCase() ?? ''} •••• ${card['last4'] ?? ''}",
         ),
         subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text("Cardholder Name: ${billing['name'] ?? 'No Name'}"),
             Row(
               children: [
                 Text("Expiration: ${card['exp_month'] ?? ''}"),
-                Text("/"),
+                const Text("/"),
                 Text("${card['exp_year'] ?? ''}"),
               ],
             ),
@@ -129,14 +133,12 @@ class _StripePaymentModuleState extends State<StripePaymentModule> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Column(
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Center(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ElevatedButton(
                   onPressed: getDetails,
@@ -147,7 +149,7 @@ class _StripePaymentModuleState extends State<StripePaymentModule> {
                 _buildCardPreview(),
               ],
             ),
-          ],
+          ),
         ),
       ),
     );

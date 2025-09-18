@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -29,6 +30,7 @@ class VcarePaymentModule {
   static Future<void> startStripeSetup({
     required String publishableKey,
     required String clientName,
+    required String applePayMerchantID,
   }) async {
     if (_stripeSecretKey == null) {
       if (kDebugMode) {
@@ -91,6 +93,9 @@ class VcarePaymentModule {
         'ephemeralKey': ephemeralKey,
         'secretKey': _stripeSecretKey,
         'clientName': clientName,
+        if (Platform.isIOS)
+          'applePayMerchantID':
+              applePayMerchantID, // Replace with your actual Merchant ID
       });
       if (kDebugMode) {
         log("🚀 Setup sheet launched");

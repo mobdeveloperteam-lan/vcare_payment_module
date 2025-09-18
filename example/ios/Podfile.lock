@@ -1,0 +1,72 @@
+PODS:
+  - Flutter (1.0.0)
+  - integration_test (0.0.1):
+    - Flutter
+  - Stripe (24.23.2):
+    - StripeApplePay (= 24.23.2)
+    - StripeCore (= 24.23.2)
+    - StripePayments (= 24.23.2)
+    - StripePaymentsUI (= 24.23.2)
+    - StripeUICore (= 24.23.2)
+  - StripeApplePay (24.23.2):
+    - StripeCore (= 24.23.2)
+  - StripeCore (24.23.2)
+  - StripePayments (24.23.2):
+    - StripeCore (= 24.23.2)
+    - StripePayments/Stripe3DS2 (= 24.23.2)
+  - StripePayments/Stripe3DS2 (24.23.2):
+    - StripeCore (= 24.23.2)
+  - StripePaymentSheet (24.23.2):
+    - StripeApplePay (= 24.23.2)
+    - StripeCore (= 24.23.2)
+    - StripePayments (= 24.23.2)
+    - StripePaymentsUI (= 24.23.2)
+  - StripePaymentsUI (24.23.2):
+    - StripeCore (= 24.23.2)
+    - StripePayments (= 24.23.2)
+    - StripeUICore (= 24.23.2)
+  - StripeUICore (24.23.2):
+    - StripeCore (= 24.23.2)
+  - vcare_payment_module (0.0.1):
+    - Flutter
+    - Stripe (~> 24.0)
+    - StripePaymentSheet (~> 24.0)
+
+DEPENDENCIES:
+  - Flutter (from `Flutter`)
+  - integration_test (from `.symlinks/plugins/integration_test/ios`)
+  - vcare_payment_module (from `.symlinks/plugins/vcare_payment_module/ios`)
+
+SPEC REPOS:
+  trunk:
+    - Stripe
+    - StripeApplePay
+    - StripeCore
+    - StripePayments
+    - StripePaymentSheet
+    - StripePaymentsUI
+    - StripeUICore
+
+EXTERNAL SOURCES:
+  Flutter:
+    :path: Flutter
+  integration_test:
+    :path: ".symlinks/plugins/integration_test/ios"
+  vcare_payment_module:
+    :path: ".symlinks/plugins/vcare_payment_module/ios"
+
+SPEC CHECKSUMS:
+  Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
+  integration_test: 4a889634ef21a45d28d50d622cf412dc6d9f586e
+  Stripe: 5897a08e040a86a2abca7770a268e3d8437c4c01
+  StripeApplePay: 6acbd50939fcbd5cfc426b8271a1843b0043c492
+  StripeCore: 97c019d4758c8f482735463b6317db9920852048
+  StripePayments: 0857ba8476e19bdfe8e155707a6442d4c9cee75a
+  StripePaymentSheet: 7836edb197dd0030c6909d3727cf424b20a019b4
+  StripePaymentsUI: 87803d2a6af9013a4409fe4733acb4d5b2cbcecd
+  StripeUICore: 56a508323168fec635430284e988c116c0be8c93
+  vcare_payment_module: d9f56dca3d596f41cbe4bf7b206c7912d3ea6104
+
+PODFILE CHECKSUM: 6263c6f0c24d9b76b4c4997b64394b0ad69ade51
+
+COCOAPODS: 1.16.2

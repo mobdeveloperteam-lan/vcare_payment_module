@@ -17,6 +17,7 @@ class _VcarePaymentViewState extends State<VcarePaymentView> {
   List<String> gateWays = [];
   Map<String, dynamic> stripeDetails = {};
   String clientName = "";
+  String applePayMerchantID = "";
   @override
   void initState() {
     super.initState();
@@ -33,6 +34,8 @@ class _VcarePaymentViewState extends State<VcarePaymentView> {
           widget.input["client_supported_payment_sdk_config"],
         );
         clientName = widget.input['client_name'] ?? "";
+        applePayMerchantID =
+            widget.input['apple_pay_merchant_id'] ?? ""; // Your Merchant ID
       } else {
         paymentModuleTruncate();
       }
@@ -83,6 +86,7 @@ class _VcarePaymentViewState extends State<VcarePaymentView> {
             return StripePaymentModule(
               details: stripeDetails,
               clientName: clientName,
+              applePayMerchantID: applePayMerchantID,
             );
           }
         }

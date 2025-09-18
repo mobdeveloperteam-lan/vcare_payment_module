@@ -1,7 +1,7 @@
 name: vcare_payment_module
 description: "A new Flutter plugin project."
-version: 0.0.1
-homepage:
+version: 1.0.0+1
+homepage: https://github.com/mobdeveloperteam-lan/vcare_payment_module.git
 
 environment:
   sdk: ^3.8.1
