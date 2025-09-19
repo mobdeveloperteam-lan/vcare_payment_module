@@ -28,6 +28,7 @@ class _StripePaymentModuleState extends State<StripePaymentModule> {
   Map<String, dynamic>? paymentMethod;
   String publishKey = "";
   String secretKey = "";
+  String amount = "0";
 
   void getDetails() {
     Map<String, dynamic> creds = widget.details;

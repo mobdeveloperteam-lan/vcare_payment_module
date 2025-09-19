@@ -24,12 +24,11 @@ class MyApp extends StatelessWidget {
             },
           },
           "client_name": "Flex Mobile",
-          "apple_pay_merchant_id": "", // Your Merchant ID
-
+          "apple_pay_merchant_id":
+              "", // Your Merchant ID
         },
       ),
       debugShowCheckedModeBanner: false,
     );
   }
 }
-

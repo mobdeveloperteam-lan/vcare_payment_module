@@ -5,7 +5,9 @@
         <meta-data
             android:name="com.example.vcare_payment_module.StripeSdkFlutterPlugin"
             android:value="FlutterPlugin" />
-
+              <meta-data
+    android:name="com.google.android.gms.wallet.api.enabled"
+    android:value="true" />
         <!-- Declare your PaymentSheetActivity -->
         <activity android:name=".StripePaymentActivity"
     android:exported="false"

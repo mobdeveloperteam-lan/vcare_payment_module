@@ -71,13 +71,22 @@ class VcarePaymentModule {
       }
 
       // 3️⃣ Create SetupIntent
+      // 3️⃣ Create SetupIntent
+      final paymentMethodTypes = ['card'];
+      var body = 'customer=$customerId';
+
+      // Append each payment method type to the body string
+      for (var type in paymentMethodTypes) {
+        body += '&payment_method_types[]=$type';
+      }
+
       final setupResp = await http.post(
         Uri.parse('https://api.stripe.com/v1/setup_intents'),
         headers: {
           'Authorization': 'Bearer $_stripeSecretKey',
           'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: {'customer': customerId, 'payment_method_types[]': 'card'},
+        body: body,
       );
       final setupBody = jsonDecode(setupResp.body);
       final clientSecret = setupBody['client_secret'];

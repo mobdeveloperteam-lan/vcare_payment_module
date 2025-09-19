@@ -1,4 +1,4 @@
-package com.example.vcare_payment_module_example
+package com.example.app
 
 import io.flutter.embedding.android.FlutterActivity
 

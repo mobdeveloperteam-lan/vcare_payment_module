@@ -35,6 +35,7 @@ class StripeSetupActivity : ComponentActivity() {
         PaymentConfiguration.init(applicationContext, publishableKey)
         paymentSheet = PaymentSheet(this, ::onPaymentSheetResult)
 
+        // **This is the correct way to enable Google Pay**
         val config = PaymentSheet.Configuration(
             merchantDisplayName = clientName,
             customer = PaymentSheet.CustomerConfiguration(
@@ -43,19 +44,21 @@ class StripeSetupActivity : ComponentActivity() {
             ),
             allowsDelayedPaymentMethods = true,
             defaultBillingDetails = PaymentSheet.BillingDetails(
-             //name = "John Doe",
-             address = PaymentSheet.Address(
-              // city = "New York",
-              // state = "NY",
-               country = "US"
-              )
+                address = PaymentSheet.Address(
+                    country = "US"
+                )
             ),
             billingDetailsCollectionConfiguration = PaymentSheet.BillingDetailsCollectionConfiguration(
-                name = PaymentSheet.BillingDetailsCollectionConfiguration.CollectionMode.Always, // 👈 Show Cardholder Name field
+                name = PaymentSheet.BillingDetailsCollectionConfiguration.CollectionMode.Always,
                 email = PaymentSheet.BillingDetailsCollectionConfiguration.CollectionMode.Never,
-              //  phone = PaymentSheet.BillingDetailsCollectionConfiguration.CollectionMode.Automatic,
                 address = PaymentSheet.BillingDetailsCollectionConfiguration.AddressCollectionMode.Never
-            )
+            ),
+            // Correctly instantiate GooglePayConfiguration and pass it as a named parameter
+           googlePay = PaymentSheet.GooglePayConfiguration(
+                environment = PaymentSheet.GooglePayConfiguration.Environment.Test,
+                countryCode = "US",
+                currencyCode = "USD"
+          )
         )
 
         paymentSheet.presentWithSetupIntent(clientSecret, config)

@@ -31,6 +31,7 @@ dependencies:
   http:
 
 dev_dependencies:
+  change_app_package_name:
   integration_test:
     sdk: flutter
   flutter_test:
