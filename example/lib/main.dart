@@ -27,12 +27,7 @@ class MyApp extends StatelessWidget {
           "client_supported_payment_sdk_config": {
             "supports_multi_gateway": false,
             "gateways": ["fluid"],
-            "stripe_configs": {
-              "secret_key":
-                  "sk_test_51S93xVABwwNeQJ4tzZZPnqSEv2Q1xVVSzon1QgChuxfvYrPUsw5BkLm03exWadZoJ4QjfyyUAFtXEMYCyasxbYyG00Dc57PP3Z",
-              "publish_key":
-                  "pk_test_51S93xVABwwNeQJ4tWa9XRWoUmVgkkOAwPlzM6RW5UzA3Zy1XB0bSvdXtn0bPrCMRaYIyLfwOhf7kcdrUSUba4g1U00FZCnUBcd",
-            },
+            "stripe_configs": {"secret_key": "", "publish_key": ""},
           },
           "client_name": "Flex Mobile",
           "apple_pay_merchant_id":
