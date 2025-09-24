@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vcare_payment_module/ui/fluid/fluid_gateway_page.dart';
 import 'package:vcare_payment_module/ui/multi_gateway_page.dart';
 import 'package:vcare_payment_module/ui/stripe_payment_module.dart';
 
@@ -88,6 +89,8 @@ class _VcarePaymentViewState extends State<VcarePaymentView> {
               clientName: clientName,
               applePayMerchantID: applePayMerchantID,
             );
+          } else if (paymentGateway == "fluid") {
+            return FluidGatewayPage();
           }
         }
       } else {
