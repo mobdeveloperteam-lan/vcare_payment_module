@@ -29,9 +29,8 @@ class MyApp extends StatelessWidget {
             "gateways": ["fluid"],
             "stripe_configs": {"secret_key": "", "publish_key": ""},
           },
-          "client_name": "Flex Mobile",
-          "apple_pay_merchant_id":
-              "merchant.com.flexmobile.appp", // Your Merchant ID
+          "client_name": "",
+          "apple_pay_merchant_id": "", // Your Merchant ID
         },
       ),
       debugShowCheckedModeBanner: false,
