@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:vcare_payment_module/ui/fluid/providers/fluid_bottom_sheet_provider.dart';
 import 'package:vcare_payment_module/ui/fluid/providers/fluid_card_form_provider.dart';
+import 'package:vcare_payment_module/ui/fluid_pay_gateway/providers/fluid_gateway_bottom_sheet_provider.dart';
 import 'package:vcare_payment_module/ui/fluid_pay_gateway/providers/fluid_pay_provider.dart';
 import 'package:vcare_payment_module/vcare_payment_module.dart';
 
@@ -9,7 +9,7 @@ void main() {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => FluidBottomSheetProvider()),
+        ChangeNotifierProvider(create: (_) => FluidGateWayBottomSheetProvider()),
         ChangeNotifierProvider(create: (_) => FluidCardFormProvider()),
         ChangeNotifierProvider(create: (_) => FluidPayProvider()),
       ],

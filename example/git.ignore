@@ -64,3 +64,16 @@ Thumbs.db
 # Firebase Crashlytics
 **/android/app/google-services.json
 **/ios/Runner/GoogleService-Info.plist
+# Explicitly ignore example app build outputs (CRITICAL)
+example/build/
+example/.dart_tool/
+example/.packages
+example/pubspec.lock
+
+# Ignore all intermediates (safety net)
+**/app/intermediates/
+**/merged_native_libs/
+**/*.so
+**/*.apk
+**/*.aar
+
